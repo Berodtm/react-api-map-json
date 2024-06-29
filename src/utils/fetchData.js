@@ -1,4 +1,4 @@
-const fetchData = async (apiPath, setData, setLoading, setError) => {
+const fetchData = async (apiPath, setData, setLoading, setError, setTotalEntities) => {
 
     try {
       setLoading(true);
@@ -22,6 +22,7 @@ const fetchData = async (apiPath, setData, setLoading, setError) => {
 
       setData(allData);
       setLoading(false);
+      setTotalEntities(allData.length);
       
       console.log(`Total number of entities fetched: ${allData.length}`);
     } catch (err) {

@@ -14,6 +14,7 @@ function App() {
   );
   const [isInitial, setIsInitial] = useState(true);
   const [fetchDataFlag, setfetchDataFlag] = useState(false);
+  const [totalEntities, setTotalEntities] = useState(0);
 
   const inputSearch = (e) => setSearch(e.target.value);
   const handleApiPathChange = (e) => setApiPath(e.target.value);
@@ -25,7 +26,7 @@ function App() {
 
   useEffect(() => {
     if (fetchDataFlag) {
-      fetchData(apiPath, setData, setLoading, setError)
+      fetchData(apiPath, setData, setLoading, setError, setTotalEntities)
       .finally(() => {
         setfetchDataFlag(false)
       })
@@ -38,7 +39,7 @@ function App() {
     <div>Please press the button to fetch data.</div>
   ) : null;
   const loadingMessage = loading ? <div>Loading...</div> : null;
-  const errorMessage = error ? <div>Error: {error}</div> : null;
+  const errorMessage = error ? <div>Error: {error}. <br />Run a dev instance of Chrome with Cors disabled to test: <code>open -na "Google Chrome" --args --user-data-dir='/tmp/Chrome dev session' --disable-web-security"</code></div> : null;
   const noDataMessage =
     !loading && !error && filteredSearch.length === 0 ? (
       <div>No data found.</div>
@@ -74,9 +75,11 @@ function App() {
       {loadingMessage}
       {errorMessage}
       {noDataMessage}
+      {!loading && !error && <p>Total number of entities fetched: {totalEntities}</p>}
       {!loading && !error && filteredSearch.length > 0 && (
         <TableList filteredData={filteredSearch} />
       )}
+
     </div>
   );
 }
