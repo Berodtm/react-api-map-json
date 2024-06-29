@@ -23,7 +23,6 @@ const fetchData = async (apiPath, setData, setLoading, setError) => {
       setData(allData);
       setLoading(false);
       
-      // Log the total number of fetched entities to the console
       console.log(`Total number of entities fetched: ${allData.length}`);
     } catch (err) {
       setError(err.message);

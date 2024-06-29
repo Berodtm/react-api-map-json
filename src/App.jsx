@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import fetchData from './utils/fetchData';
 import filterData from './utils/filterData';
-import Table from './components/Table';
+import TableList from './components/TableList';
 
 function App() {
   const [data, setData] = useState([]);
@@ -13,48 +13,26 @@ function App() {
     'core-leads/lly-retail/card/app/asm/s/tn/rn/cnv'
   );
   const [isInitial, setIsInitial] = useState(true);
+  const [fetchDataFlag, setfetchDataFlag] = useState(false);
 
   const inputSearch = (e) => setSearch(e.target.value);
   const handleApiPathChange = (e) => setApiPath(e.target.value);
 
   const handleFetchData = () => {
     setIsInitial(false);
-    fetchData(apiPath, setData, setLoading, setError);
+    setfetchDataFlag(true)
   };
+
+  useEffect(() => {
+    if (fetchDataFlag) {
+      fetchData(apiPath, setData, setLoading, setError)
+      .finally(() => {
+        setfetchDataFlag(false)
+      })
+    }
+  }, [fetchDataFlag, apiPath])
 
   const filteredSearch = filterData(data, search);
-
-  const renderTables = (filteredData) => {
-    return filteredData.map((entity, index) => {
-      const { title, description, elements } = entity.properties;
-      const {
-        ctaPrimaryText,
-        ctaPrimaryLink,
-        ctaPrimaryStyle,
-        titleText,
-        bodyText,
-        style,
-        imageUrl,
-      } = elements;
-
-      return (
-        <Table
-          key={index}
-          index={index}
-          title={title}
-          description={description}
-          titleText={titleText}
-          bodyText={bodyText}
-          ctaPrimaryText={ctaPrimaryText}
-          ctaPrimaryLink={ctaPrimaryLink}
-          ctaPrimaryStyle={ctaPrimaryStyle}
-          style={style}
-          imageUrl={imageUrl}
-          link={entity.links[0].href}
-        />
-      );
-    });
-  };
 
   const initialMessage = isInitial ? (
     <div>Please press the button to fetch data.</div>
@@ -65,10 +43,6 @@ function App() {
     !loading && !error && filteredSearch.length === 0 ? (
       <div>No data found.</div>
     ) : null;
-  const tables =
-    !loading && !error && filteredSearch.length > 0
-      ? renderTables(filteredSearch)
-      : null;
 
   return (
     <div>
@@ -100,7 +74,9 @@ function App() {
       {loadingMessage}
       {errorMessage}
       {noDataMessage}
-      {tables}
+      {!loading && !error && filteredSearch.length > 0 && (
+        <TableList filteredData={filteredSearch} />
+      )}
     </div>
   );
 }
